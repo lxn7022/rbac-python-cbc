@@ -90,7 +90,15 @@ docker-compose.yml
 *password*
 *secret*
 *token*
+.env.local
+.env.*.local
 
 # 备份文件
 *.backup
 *.old
+
+# 测试相关敏感文件
+test_supabase_connection.py
+test_*.py
+!tests/
+diagnose_connection.py

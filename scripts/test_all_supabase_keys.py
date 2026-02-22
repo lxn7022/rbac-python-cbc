@@ -8,13 +8,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 当前配置
+# 当前配置（从环境变量读取）
 SUPABASE_URL = os.getenv('SUPABASE_URL')
 ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
 SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
-
-# 新提供的密钥
-PUBLISHABLE_KEY = "sb_publishable__ZlhOSIkVPufgPRg_0kiCg_o6D1y4W5"
+PUBLISHABLE_KEY = os.getenv('SUPABASE_PUBLISHABLE_KEY')
 
 print("=" * 70)
 print("Supabase 密钥分析")

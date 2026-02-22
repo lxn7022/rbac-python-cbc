@@ -9,10 +9,14 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Supabase 配置
-SUPABASE_URL = os.getenv('SUPABASE_URL')  # https://orygzioqsfvuauzklogx.supabase.co
+# Supabase 配置（从环境变量读取）
+SUPABASE_URL = os.getenv('SUPABASE_URL')
 SUPABASE_ANON_KEY = os.getenv('SUPABASE_ANON_KEY')
 SUPABASE_SERVICE_ROLE_KEY = os.getenv('SUPABASE_SERVICE_ROLE_KEY')
+
+if not SUPABASE_URL:
+    print("错误: SUPABASE_URL 环境变量未设置")
+    sys.exit(1)
 
 # 提取项目引用
 project_ref = SUPABASE_URL.split('//')[1].split('.supabase.co')[0]
@@ -81,9 +85,9 @@ for i, conn_url in enumerate(connection_formats, 1):
 print("\n" + "=" * 70)
 print("所有连接格式均失败")
 print("=" * 70)
-print("""
+print(f"""
 建议:
-1. 访问 Supabase Dashboard: https://supabase.com/dashboard/project/orygzioqsfvuauzklogx
+1. 访问 Supabase Dashboard: https://supabase.com/dashboard/project/{project_ref}
 2. 进入 Settings -> Database
 3. 找到 "Connection string"
 4. 选择 "URI" 格式

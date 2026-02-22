@@ -23,8 +23,21 @@ def test_port_connectivity():
     """测试端口连通性"""
     print_header("测试 1: 端口连通性检查")
     
+    # 从环境变量获取项目 URL
+    supabase_url = os.getenv('SUPABASE_URL')
+    if not supabase_url:
+        print("  ❌ SUPABASE_URL 未设置，无法测试端口连通性")
+        return {}
+    
+    # 提取项目引用
+    try:
+        project_ref = supabase_url.split('//')[1].split('.supabase.co')[0]
+    except:
+        print(f"  ❌ 无法解析 SUPABASE_URL: {supabase_url}")
+        return {}
+    
     hosts = [
-        ("db.orygzioqsfvuauzklogx.supabase.co", 5432, "Supabase 直连"),
+        (f"db.{project_ref}.supabase.co", 5432, "Supabase 直连"),
         ("aws-0-ap-southeast-1.pooler.supabase.com", 6543, "Supabase Pooler"),
     ]
     
@@ -63,7 +76,12 @@ def test_https_connectivity():
     try:
         import requests
         
-        url = "https://orygzioqsfvuauzklogx.supabase.co/rest/v1/"
+        supabase_url = os.getenv('SUPABASE_URL')
+        if not supabase_url:
+            print("  ❌ SUPABASE_URL 未设置，无法测试 HTTPS 连接")
+            return False
+        
+        url = f"{supabase_url}/rest/v1/"
         
         print(f"\n测试 REST API ({url})...")
         

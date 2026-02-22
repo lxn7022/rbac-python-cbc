@@ -14,9 +14,14 @@ from supabase import create_client, Client
 
 def test_supabase_connection_api():
     """测试 Supabase API 连接"""
-    # Supabase 配置
-    SUPABASE_URL = os.getenv("SUPABASE_URL", "https://orygzioqsfvuauzklogx.supabase.co")
-    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY", "YOUR_SUPABASE_ANON_KEY_HERE")
+    # Supabase 配置（从环境变量读取，无默认值）
+    SUPABASE_URL = os.getenv("SUPABASE_URL")
+    SUPABASE_ANON_KEY = os.getenv("SUPABASE_ANON_KEY")
+    
+    # 如果环境变量未设置，跳过测试
+    if not SUPABASE_URL or not SUPABASE_ANON_KEY:
+        import pytest
+        pytest.skip("SUPABASE_URL 或 SUPABASE_ANON_KEY 未设置，跳过测试")
 
     # 创建客户端
     supabase: Client = create_client(SUPABASE_URL, SUPABASE_ANON_KEY)
