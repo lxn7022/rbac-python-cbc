@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RBAC 管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 10px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header .user-name {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .card {
+            background: white;
+            border-radius: 10px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        table th, table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        table th {
+            background: #f8f9fa;
+            color: #333;
+            font-weight: 600;
+        }
+
+        table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .alert {
+            padding: 12px 20px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .header-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+
+        .header-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .header-item {
+            display: flex;
+            margin-bottom: 10px;
+            padding: 8px;
+            background: white;
+            border-radius: 3px;
+        }
+
+        .header-key {
+            font-weight: 600;
+            color: #667eea;
+            min-width: 200px;
+        }
+
+        .header-value {
+            color: #666;
+            word-break: break-all;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            background: #f8f9fa;
+            border: none;
+            border-radius: 5px 5px 0 0;
+            cursor: pointer;
+            color: #666;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 2px solid #667eea;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .pagination button {
+            padding: 8px 15px;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .pagination button:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .stat-label {
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 登录页面 -->
+        <div id="loginPage" class="login-container card">
+            <h2>🔐 用户登录</h2>
+            <div id="loginAlert" class="hidden"></div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="username" required placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="password" required placeholder="请输入密码">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">登录</button>
+            </form>
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="showRegister()" class="btn" style="background: #f8f9fa; color: #667eea;">
+                    没有账号？立即注册
+                </button>
+            </div>
+        </div>
+
+        <!-- 注册页面 -->
+        <div id="registerPage" class="login-container card hidden">
+            <h2>📝 用户注册</h2>
+            <div id="registerAlert" class="hidden"></div>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label>用户名</label>
+                    <input type="text" id="regUsername" required placeholder="请输入用户名">
+                </div>
+                <div class="form-group">
+                    <label>邮箱</label>
+                    <input type="email" id="regEmail" required placeholder="请输入邮箱">
+                </div>
+                <div class="form-group">
+                    <label>密码</label>
+                    <input type="password" id="regPassword" required placeholder="请输入密码（至少8位）">
+                </div>
+                <div class="form-group">
+                    <label>全名（可选）</label>
+                    <input type="text" id="regFullName" placeholder="请输入全名">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%;">注册</button>
+            </form>
+            <div style="margin-top: 20px; text-align: center;">
+                <button onclick="showLogin()" class="btn" style="background: #f8f9fa; color: #667eea;">
+                    已有账号？立即登录
+                </button>
+            </div>
+        </div>
+
+        <!-- 主页面 -->
+        <div id="mainPage" class="hidden">
+            <!-- 头部 -->
+            <div class="header">
+                <h1>🏢 RBAC 管理系统</h1>
+                <div class="user-info">
+                    <span class="user-name" id="currentUser"></span>
+                    <button onclick="logout()" class="btn btn-danger btn-sm">退出登录</button>
+                </div>
+            </div>
+
+            <!-- 标签页 -->
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab('users')">用户管理</button>
+                <button class="tab" onclick="switchTab('headers')">请求头信息</button>
+            </div>
+
+            <!-- 用户管理 -->
+            <div id="usersTab" class="card">
+                <h2>👥 用户列表</h2>
+                <div id="usersAlert" class="hidden"></div>
+                <div id="usersLoading" class="loading hidden">
+                    <div>加载中...</div>
+                </div>
+                <div id="usersContent" class="hidden">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>用户名</th>
+                                    <th>邮箱</th>
+                                    <th>全名</th>
+                                    <th>状态</th>
+                                    <th>注册时间</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody">
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination" id="pagination">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 请求头信息 -->
+            <div id="headersTab" class="card hidden">
+                <h2>📋 请求头信息</h2>
+                <p style="color: #666; margin-bottom: 15px;">显示当前请求的 Header 字段</p>
+                <div class="header-info">
+                    <h3>🔑 Authorization Header</h3>
+                    <div class="header-item">
+                        <div class="header-key">Authorization:</div>
+                        <div class="header-value" id="authHeader">-</div>
+                    </div>
+                </div>
+                <div class="header-info" style="margin-top: 20px;">
+                    <h3>📄 完整请求头</h3>
+                    <div id="allHeaders"></div>
+                </div>
+                <div class="header-info" style="margin-top: 20px;">
+                    <h3>🍪 Cookies</h3>
+                    <div id="cookiesInfo"></div>
+                </div>
+                <div style="margin-top: 20px;">
+                    <button onclick="refreshHeaders()" class="btn btn-primary">刷新请求头</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API 基础 URL
+        const API_BASE = window.location.origin + '/api/v1';
+        
+        // 当前页码
+        let currentPage = 1;
+        const pageSize = 20;
+
+        // ==================== Cookie 工具函数 ====================
+        
+        /**
+         * 设置 Cookie
+         */
+        function setCookie(name, value, days = 7) {
+            const expires = new Date();
+            expires.setTime(expires.getTime() + days * 24 * 60 * 60 * 1000);
+            document.cookie = `${name}=${encodeURIComponent(value)};expires=${expires.toUTCString()};path=/`;
+        }
+
+        /**
+         * 获取 Cookie
+         */
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) {
+                    return decodeURIComponent(c.substring(nameEQ.length, c.length));
+                }
+            }
+            return null;
+        }
+
+        /**
+         * 删除 Cookie
+         */
+        function deleteCookie(name) {
+            document.cookie = `${name}=;expires=Thu, 01 Jan 1970 00:00:01 GMT;path=/`;
+        }
+
+        // ==================== 认证相关 ====================
+
+        /**
+         * 登录
+         */
+        async function login(username, password) {
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ username, password })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    // 存储 access_token 到 Cookie
+                    setCookie('access_token', data.access_token, 1); // 1天过期
+                    
+                    // 存储用户信息
+                    setCookie('user_info', JSON.stringify(data.user), 1);
+                    
+                    showAlert('loginAlert', '登录成功！', 'success');
+                    
+                    // 跳转到主页面
+                    setTimeout(() => {
+                        showMainPage();
+                    }, 500);
+                    
+                    return true;
+                } else {
+                    showAlert('loginAlert', data.detail || '登录失败', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('登录错误:', error);
+                showAlert('loginAlert', '登录失败: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 注册
+         */
+        async function register(username, email, password, fullName) {
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        username,
+                        email,
+                        password,
+                        full_name: fullName || null
+                    })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showAlert('registerAlert', '注册成功！请登录', 'success');
+                    setTimeout(() => {
+                        showLogin();
+                    }, 1000);
+                    return true;
+                } else {
+                    showAlert('registerAlert', data.detail || '注册失败', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('注册错误:', error);
+                showAlert('registerAlert', '注册失败: ' + error.message, 'error');
+                return false;
+            }
+        }
+
+        /**
+         * 登出
+         */
+        function logout() {
+            deleteCookie('access_token');
+            deleteCookie('user_info');
+            showLoginPage();
+        }
+
+        /**
+         * 检查登录状态
+         */
+        function checkAuth() {
+            const token = getCookie('access_token');
+            if (token) {
+                showMainPage();
+                return true;
+            }
+            showLoginPage();
+            return false;
+        }
+
+        // ==================== API 请求 ====================
+
+        /**
+         * 获取认证头
+         */
+        function getAuthHeaders() {
+            const token = getCookie('access_token');
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+            
+            if (token) {
+                headers['Authorization'] = `Bearer ${token}`;
+            }
+            
+            return headers;
+        }
+
+        /**
+         * 获取用户列表
+         */
+        async function fetchUsers(page = 1) {
+            try {
+                document.getElementById('usersLoading').classList.remove('hidden');
+                document.getElementById('usersContent').classList.add('hidden');
+
+                const headers = getAuthHeaders();
+                
+                // 更新请求头显示
+                updateHeadersDisplay(headers);
+
+                const response = await fetch(`${API_BASE}/users?page=${page}&size=${pageSize}`, {
+                    method: 'GET',
+                    headers: headers
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    return;
+                }
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    renderUsers(data);
+                } else {
+                    showAlert('usersAlert', data.detail || '获取用户列表失败', 'error');
+                }
+            } catch (error) {
+                console.error('获取用户列表错误:', error);
+                showAlert('usersAlert', '获取用户列表失败: ' + error.message, 'error');
+            } finally {
+                document.getElementById('usersLoading').classList.add('hidden');
+                document.getElementById('usersContent').classList.remove('hidden');
+            }
+        }
+
+        // ==================== UI 渲染 ====================
+
+        /**
+         * 渲染用户列表
+         */
+        function renderUsers(data) {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = '';
+
+            data.items.forEach(user => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${user.id}</td>
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${user.full_name || '-'}</td>
+                    <td>
+                        <span class="badge ${user.is_active ? 'badge-success' : 'badge-danger'}">
+                            ${user.is_active ? '活跃' : '禁用'}
+                        </span>
+                    </td>
+                    <td>${new Date(user.created_at).toLocaleString('zh-CN')}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // 渲染分页
+            renderPagination(data.page, data.total);
+        }
+
+        /**
+         * 渲染分页
+         */
+        function renderPagination(page, total) {
+            const pagination = document.getElementById('pagination');
+            const totalPages = Math.ceil(total / pageSize);
+            
+            pagination.innerHTML = `
+                <button onclick="changePage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>上一页</button>
+                <span style="padding: 8px 15px;">第 ${page} / ${totalPages} 页（共 ${total} 条）</span>
+                <button onclick="changePage(${page + 1})" ${page >= totalPages ? 'disabled' : ''}>下一页</button>
+            `;
+        }
+
+        /**
+         * 切换页面
+         */
+        function changePage(page) {
+            currentPage = page;
+            fetchUsers(page);
+        }
+
+        /**
+         * 更新请求头显示
+         */
+        function updateHeadersDisplay(headers) {
+            // 显示 Authorization Header
+            const authHeader = headers['Authorization'] || '-';
+            document.getElementById('authHeader').textContent = authHeader;
+
+            // 显示所有请求头
+            const allHeadersDiv = document.getElementById('allHeaders');
+            allHeadersDiv.innerHTML = '';
+            
+            Object.keys(headers).forEach(key => {
+                const item = document.createElement('div');
+                item.className = 'header-item';
+                item.innerHTML = `
+                    <div class="header-key">${key}:</div>
+                    <div class="header-value">${headers[key]}</div>
+                `;
+                allHeadersDiv.appendChild(item);
+            });
+
+            // 显示 Cookies
+            const cookiesDiv = document.getElementById('cookiesInfo');
+            cookiesDiv.innerHTML = '';
+            
+            const cookies = document.cookie.split(';').filter(c => c.trim());
+            if (cookies.length > 0) {
+                cookies.forEach(cookie => {
+                    const [name, value] = cookie.trim().split('=');
+                    const item = document.createElement('div');
+                    item.className = 'header-item';
+                    item.innerHTML = `
+                        <div class="header-key">${name}:</div>
+                        <div class="header-value">${decodeURIComponent(value)}</div>
+                    `;
+                    cookiesDiv.appendChild(item);
+                });
+            } else {
+                cookiesDiv.innerHTML = '<div class="header-item"><div class="header-value">无 Cookie</div></div>';
+            }
+        }
+
+        /**
+         * 刷新请求头显示
+         */
+        function refreshHeaders() {
+            const headers = getAuthHeaders();
+            updateHeadersDisplay(headers);
+        }
+
+        // ==================== 页面切换 ====================
+
+        function showLoginPage() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+        }
+
+        function showRegister() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.remove('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+        }
+
+        function showLogin() {
+            document.getElementById('loginPage').classList.remove('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.add('hidden');
+        }
+
+        function showMainPage() {
+            document.getElementById('loginPage').classList.add('hidden');
+            document.getElementById('registerPage').classList.add('hidden');
+            document.getElementById('mainPage').classList.remove('hidden');
+            
+            // 显示用户信息
+            const userInfo = getCookie('user_info');
+            if (userInfo) {
+                const user = JSON.parse(userInfo);
+                document.getElementById('currentUser').textContent = `欢迎，${user.username}`;
+            }
+            
+            // 加载用户列表
+            fetchUsers(currentPage);
+            
+            // 更新请求头显示
+            refreshHeaders();
+        }
+
+        function switchTab(tabName) {
+            // 切换标签页样式
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // 显示对应内容
+            if (tabName === 'users') {
+                document.getElementById('usersTab').classList.remove('hidden');
+                document.getElementById('headersTab').classList.add('hidden');
+            } else if (tabName === 'headers') {
+                document.getElementById('usersTab').classList.add('hidden');
+                document.getElementById('headersTab').classList.remove('hidden');
+                refreshHeaders();
+            }
+        }
+
+        // ==================== 工具函数 ====================
+
+        function showAlert(elementId, message, type) {
+            const alert = document.getElementById(elementId);
+            alert.className = `alert alert-${type}`;
+            alert.textContent = message;
+            alert.classList.remove('hidden');
+            
+            setTimeout(() => {
+                alert.classList.add('hidden');
+            }, 3000);
+        }
+
+        // ==================== 事件绑定 ====================
+
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            await login(username, password);
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('regUsername').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const fullName = document.getElementById('regFullName').value;
+            await register(username, email, password, fullName);
+        });
+
+        // ==================== 初始化 ====================
+
+        // 页面加载时检查登录状态
+        window.addEventListener('load', () => {
+            checkAuth();
+        });
+    </script>
+</body>
+</html>

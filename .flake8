@@ -1,0 +1,34 @@
+[flake8]
+# flake8 配置文件
+
+# 最大行长度
+max-line-length = 100
+
+# 排除的目录和文件
+exclude =
+    .git,
+    __pycache__,
+    venv,
+    env,
+    .venv,
+    build,
+    dist,
+    *.egg-info,
+    .pytest_cache,
+    .mypy_cache,
+    .codebuddy
+
+# 忽略的错误代码
+ignore =
+    E203,  # 空格前的冒号
+    W503,  # 二元运算符前的换行
+    E501,  # 行过长（由 black 处理）
+
+# 启用的扩展
+enable-extensions =
+    G  # flake8-logging-format
+
+# Per-file ignores
+per-file-ignores =
+    __init__.py:F401
+    tests/*:D
